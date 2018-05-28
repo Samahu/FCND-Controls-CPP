@@ -69,7 +69,7 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
   // You'll need the arm length parameter L, and the drag/thrust ratio kappa
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
+    
     auto l = L / sqrt(2);
     
     auto c_bar = collThrustCmd;
@@ -82,10 +82,10 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
     auto omega_3 = 0.25f * (c_bar + p_bar - q_bar + r_bar);
     auto omega_4 = 0.25f * (c_bar - p_bar - r_bar - q_bar);
     
-    cmd.desiredThrustsN[0] = kappa * (omega_1); // front left
-    cmd.desiredThrustsN[1] = kappa * (omega_2); // front right
-    cmd.desiredThrustsN[2] = kappa * (omega_3); // rear left
-    cmd.desiredThrustsN[3] = kappa * (omega_4); // rear right
+    cmd.desiredThrustsN[0] = CONSTRAIN( kappa * (omega_1), minMotorThrust, maxMotorThrust ); // front left
+    cmd.desiredThrustsN[1] = CONSTRAIN( kappa * (omega_2), minMotorThrust, maxMotorThrust ); // front right
+    cmd.desiredThrustsN[2] = CONSTRAIN( kappa * (omega_3), minMotorThrust, maxMotorThrust ); // rear left
+    cmd.desiredThrustsN[3] = CONSTRAIN( kappa * (omega_4), minMotorThrust, maxMotorThrust ); // rear right
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
@@ -145,25 +145,17 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
     
-    auto b_x_c = kpBank * (accelCmd.x - R(0, 2));
-    auto b_y_c = kpBank * (accelCmd.y - R(1, 2));
+    auto c = collThrustCmd / mass;
+    
+    auto b_x_c_target = accelCmd.x / c;
+    auto b_y_c_target = accelCmd.y / c;
+    
+    auto b_x_c = kpBank * (b_x_c_target - R(0, 2));
+    auto b_y_c = kpBank * (b_y_c_target - R(1, 2));
     
     pqrCmd.x = ( R(1, 0) * b_x_c - R(0, 0) * b_y_c ) / R(2, 2);
     pqrCmd.y = ( R(1, 1) * b_x_c - R(0, 1) * b_y_c ) / R(2, 2);
-
-    /*
-     # TODO replace with your own implementation
-     # return p_c, q_c
-     
-     A = np.array([[rot_mat[1, 0], -rot_mat[0, 0]], [rot_mat[1, 1], -rot_mat[0, 1]]])
-     b_x_c = self.k_p_roll * (b_x_c_target - rot_mat[0, 2])
-     b_y_c = self.k_p_pitch * (b_y_c_target - rot_mat[1, 2])
-     B = np.array([b_x_c, b_y_c])
-     
-     C = np.dot(A, B) / rot_mat[2, 2]
-     
-     return C[0], C[1]
-     */
+    pqrCmd.z = 0;
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
@@ -274,10 +266,14 @@ VehicleCommand QuadControl::RunControl(float dt, float simTime)
   collThrustCmd = CONSTRAIN(collThrustCmd, (minMotorThrust+ thrustMargin)*4.f, (maxMotorThrust-thrustMargin)*4.f);
   
   V3F desAcc = LateralPositionControl(curTrajPoint.position, curTrajPoint.velocity, estPos, estVel, curTrajPoint.accel);
-  
+    
+    // desAcc = V3F(0,0,0);
+    
   V3F desOmega = RollPitchControl(desAcc, estAtt, collThrustCmd);
   desOmega.z = YawControl(curTrajPoint.attitude.Yaw(), estAtt.Yaw());
 
+    // desOmega = V3F(0,0,0);
+    
   V3F desMoment = BodyRateControl(desOmega, estOmega);
 
   return GenerateMotorCommands(collThrustCmd, desMoment);
