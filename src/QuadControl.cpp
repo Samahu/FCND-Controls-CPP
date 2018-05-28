@@ -70,10 +70,21 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
 
-  cmd.desiredThrustsN[0] = mass * 9.81f / 4.f; // front left
-  cmd.desiredThrustsN[1] = mass * 9.81f / 4.f; // front right
-  cmd.desiredThrustsN[2] = mass * 9.81f / 4.f; // rear left
-  cmd.desiredThrustsN[3] = mass * 9.81f / 4.f; // rear right
+    // auto c_bar = - collThrustCmd * mass / kappa;
+    auto c_bar = collThrustCmd * mass / kappa;
+    auto p_bar = momentCmd.x / (kappa * L);
+    auto q_bar = momentCmd.y / (kappa * L);
+    auto r_bar = momentCmd.z / kappa; //self.k_m
+
+    auto omega_4 = (c_bar + p_bar - r_bar - q_bar)/4;
+    auto omega_3 = (r_bar - p_bar)/2 + omega_4;
+    auto omega_2 = (c_bar - p_bar)/2 - omega_3;
+    auto omega_1 = c_bar - omega_2 - omega_3 - omega_4;
+    
+    cmd.desiredThrustsN[0] = kappa * (omega_1); // front left
+    cmd.desiredThrustsN[1] = kappa * (omega_2); // front right
+    cmd.desiredThrustsN[2] = kappa * (omega_3); // rear left
+    cmd.desiredThrustsN[3] = kappa * (omega_4); // rear right
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
@@ -98,7 +109,13 @@ V3F QuadControl::BodyRateControl(V3F pqrCmd, V3F pqr)
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
 
-  
+    auto pqrError = pqrCmd - pqr;
+    auto u_bar = kpPQR * pqrError;
+    
+    
+    momentCmd.x = Ixx * u_bar.x;
+    momentCmd.y = Iyy * u_bar.y;
+    momentCmd.z = Izz * u_bar.z;
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
@@ -128,8 +145,26 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
   Mat3x3F R = attitude.RotationMatrix_IwrtB();
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
+    
+    auto b_x_c = kpBank * (accelCmd.x - R(0, 2));
+    auto b_y_c = kpBank * (accelCmd.y - R(1, 2));
+    
+    pqrCmd.x = ( R(1, 0) * b_x_c - R(0, 0) * b_y_c ) / R(2, 2);
+    pqrCmd.y = ( R(1, 1) * b_x_c - R(0, 1) * b_y_c ) / R(2, 2);
 
-
+    /*
+     # TODO replace with your own implementation
+     # return p_c, q_c
+     
+     A = np.array([[rot_mat[1, 0], -rot_mat[0, 0]], [rot_mat[1, 1], -rot_mat[0, 1]]])
+     b_x_c = self.k_p_roll * (b_x_c_target - rot_mat[0, 2])
+     b_y_c = self.k_p_pitch * (b_y_c_target - rot_mat[1, 2])
+     B = np.array([b_x_c, b_y_c])
+     
+     C = np.dot(A, B) / rot_mat[2, 2]
+     
+     return C[0], C[1]
+     */
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
