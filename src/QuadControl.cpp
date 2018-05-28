@@ -70,16 +70,17 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
 
-    // auto c_bar = - collThrustCmd * mass / kappa;
-    auto c_bar = collThrustCmd * mass / kappa;
-    auto p_bar = momentCmd.x / (kappa * L);
-    auto q_bar = momentCmd.y / (kappa * L);
-    auto r_bar = momentCmd.z / kappa; //self.k_m
+    auto l = L / sqrt(2);
+    
+    auto c_bar = collThrustCmd;
+    auto p_bar = momentCmd.x / (kappa * l);
+    auto q_bar = momentCmd.y / (kappa * l);
+    auto r_bar = momentCmd.z / kappa;
 
-    auto omega_4 = (c_bar + p_bar - r_bar - q_bar)/4;
-    auto omega_3 = (r_bar - p_bar)/2 + omega_4;
-    auto omega_2 = (c_bar - p_bar)/2 - omega_3;
-    auto omega_1 = c_bar - omega_2 - omega_3 - omega_4;
+    auto omega_1 = 0.25f * (c_bar + p_bar + q_bar - r_bar);
+    auto omega_2 = 0.25f * (c_bar - p_bar + q_bar + r_bar);
+    auto omega_3 = 0.25f * (c_bar + p_bar - q_bar + r_bar);
+    auto omega_4 = 0.25f * (c_bar - p_bar - r_bar - q_bar);
     
     cmd.desiredThrustsN[0] = kappa * (omega_1); // front left
     cmd.desiredThrustsN[1] = kappa * (omega_2); // front right
@@ -111,8 +112,6 @@ V3F QuadControl::BodyRateControl(V3F pqrCmd, V3F pqr)
 
     auto pqrError = pqrCmd - pqr;
     auto u_bar = kpPQR * pqrError;
-    
-    
     momentCmd.x = Ixx * u_bar.x;
     momentCmd.y = Iyy * u_bar.y;
     momentCmd.z = Izz * u_bar.z;
