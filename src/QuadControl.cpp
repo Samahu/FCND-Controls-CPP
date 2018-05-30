@@ -72,11 +72,9 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
     
-    auto l = L / sqrt(2);
-    
-    auto c_bar = - collThrustCmd / mass;
-    auto p_bar = momentCmd.x / (kappa * l);
-    auto q_bar = momentCmd.y / (kappa * l);
+    auto c_bar = collThrustCmd;
+    auto p_bar = 2.0f * momentCmd.x / L / sqrt(2);
+    auto q_bar = 2.0f * momentCmd.y / L / sqrt(2);
     auto r_bar = momentCmd.z / kappa;
 
     auto omega_1 = 0.25f * (c_bar + p_bar + q_bar - r_bar);
@@ -84,11 +82,11 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
     auto omega_3 = 0.25f * (c_bar + p_bar - q_bar + r_bar);
     auto omega_4 = 0.25f * (c_bar - p_bar - r_bar - q_bar);
     
-    cmd.desiredThrustsN[0] = CONSTRAIN( kappa * (omega_1), minMotorThrust, maxMotorThrust ); // front left
-    cmd.desiredThrustsN[1] = CONSTRAIN( kappa * (omega_2), minMotorThrust, maxMotorThrust ); // front right
-    cmd.desiredThrustsN[2] = CONSTRAIN( kappa * (omega_3), minMotorThrust, maxMotorThrust ); // rear left
-    cmd.desiredThrustsN[3] = CONSTRAIN( kappa * (omega_4), minMotorThrust, maxMotorThrust ); // rear right
-
+    cmd.desiredThrustsN[0] = omega_1; // front left
+    cmd.desiredThrustsN[1] = omega_2; // front right
+    cmd.desiredThrustsN[2] = omega_3; // rear left
+    cmd.desiredThrustsN[3] = omega_4; // rear right
+    
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
   return cmd;
@@ -193,13 +191,13 @@ float QuadControl::AltitudeControl(float posZCmd, float velZCmd, float posZ, flo
     auto velocityError = velZCmd - velZ;
     integratedAltitudeError += dt * positionError;
     
-    auto speedZ = CONSTRAIN(kpPosZ * positionError, -maxDescentRate, maxAscentRate);
+    auto speedZ = CONSTRAIN(kpPosZ * positionError, -maxAscentRate, maxDescentRate);
     
-    auto u_bar = speedZ + kpVelZ * velocityError + kpPosZ * integratedAltitudeError + accelZCmd;
-    thrust = mass * (u_bar - CONST_GRAVITY) / R(2, 2);
+    auto u_bar = speedZ + kpVelZ * velocityError + KiPosZ * integratedAltitudeError + accelZCmd;
+    thrust = - mass * (u_bar - CONST_GRAVITY) / R(2, 2);
     
   /////////////////////////////// END STUDENT CODE ////////////////////////////
-  
+    
   return thrust;
 }
 
