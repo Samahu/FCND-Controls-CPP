@@ -1,4 +1,4 @@
-for project write-up check `SUMMARY.md`
+for project write-up check [a relative link](SUMMARY.md)
 
 # The C++ Project Readme #
 

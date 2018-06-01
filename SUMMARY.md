@@ -188,18 +188,18 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
 The following parameters were modified such that all 4 different scenarios would pass.
 
 ## Position control gains ##
-kpPosXY = 2.5       // original 1
-kpPosZ = 2.5         // original 1
-KiPosZ = 50           // original 20
+kpPosXY = 2.5       // original 1  
+kpPosZ = 2.5         // original 1  
+KiPosZ = 50           // original 20  
 
 ## Velocity control gains ##
-kpVelXY = 8         // original 4
-kpVelZ = 8           // original 
+kpVelXY = 8         // original 4  
+kpVelZ = 8           // original 4  
 
 ## Angle control gains ##
-kpBank = 12         // original 5
-kpYaw = 3             // original 1
+kpBank = 12         // original 5  
+kpYaw = 3             // original 1  
 
 ## Angle rate gains ##
-kpPQR = 75, 75, 15  // original 23, 23, 5
+kpPQR = 75, 75, 15  // original 23, 23, 5  
 
