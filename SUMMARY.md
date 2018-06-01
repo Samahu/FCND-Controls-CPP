@@ -193,7 +193,7 @@ kpPosZ = 2.5         // original 1
 KiPosZ = 50           // original 20  
 
 ## Velocity control gains ##
-kpVelXY = 8         // original 4  
+kpVelXY = 11         // original 4  (increasing this from 8 to 11 helped get scenario 5 working)
 kpVelZ = 8           // original 4  
 
 ## Angle control gains ##
