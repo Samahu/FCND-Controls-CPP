@@ -1,3 +1,5 @@
+for project write-up check `SUMMARY.md`
+
 # The C++ Project Readme #
 
 This is the readme for the C++ project.

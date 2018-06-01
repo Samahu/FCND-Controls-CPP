@@ -124,6 +124,7 @@
 		DBD204F8203636AA00E0F55A /* 5_TrajectoryFollow.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = 5_TrajectoryFollow.txt; path = ../config/5_TrajectoryFollow.txt; sourceTree = "<group>"; };
 		DBD204F9203636AA00E0F55A /* QuadControlParams.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = QuadControlParams.txt; path = ../config/QuadControlParams.txt; sourceTree = "<group>"; };
 		DBD204FA203636AA00E0F55A /* 1_Intro.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = 1_Intro.txt; path = ../config/1_Intro.txt; sourceTree = "<group>"; };
+		DE13BCB920C0F3ED001C54D1 /* SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = SUMMARY.md; path = ../SUMMARY.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +173,7 @@
 		DB49FAD5202A039100DED4E6 = {
 			isa = PBXGroup;
 			children = (
+				DE13BCB920C0F3ED001C54D1 /* SUMMARY.md */,
 				DB31989C2033405F008ACD56 /* config */,
 				DB49FB34202A0CC600DED4E6 /* src */,
 				DB49FADF202A039100DED4E6 /* Products */,
